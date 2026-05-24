@@ -24,6 +24,7 @@ Developed Using:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 
 #define MAX_TASKS 100
 #define MAX_LENGTH 100
@@ -36,7 +37,7 @@ struct Task {
 struct Task tasks[MAX_TASKS];
 int taskCount = 0;
 
-// Function declarations
+/* Function Declarations */
 void addTask();
 void viewTasks();
 void markComplete();
@@ -46,48 +47,71 @@ void clearScreen();
 void pauseScreen();
 void saveTasks();
 void loadTasks();
+void setColor(int color);
+
+/* Color Function */
+void setColor(int color) {
+    SetConsoleTextAttribute(
+        GetStdHandle(STD_OUTPUT_HANDLE),
+        color
+    );
+}
 
 int main() {
+
     int choice;
 
     loadTasks();
 
     while (1) {
+
         clearScreen();
 
-printf("\n");
-printf("=====================================\n");
-printf("         SIMPLE TO-DO LIST\n");
-printf("=====================================\n");
+        int completed = 0;
 
-int completed = 0;
+        for (int i = 0; i < taskCount; i++) {
+            if (tasks[i].completed) {
+                completed++;
+            }
+        }
 
-for(int i = 0; i < taskCount; i++) {
+        /* Title */
+        setColor(11);
+        printf("\n");
+        printf("=====================================\n");
+        printf("         SIMPLE TO-DO LIST\n");
+        printf("=====================================\n");
 
-    if(tasks[i].completed) {
-        completed++;
-    }
-}
+        /* Statistics */
+        setColor(14);
+        printf("Total Tasks     : %d\n", taskCount);
+        printf("Completed Tasks : %d\n", completed);
+        printf("Pending Tasks   : %d\n",
+               taskCount - completed);
 
-printf("Total Tasks     : %d\n", taskCount);
-printf("Completed Tasks : %d\n", completed);
-printf("Pending Tasks   : %d\n",
-       taskCount - completed);
+        /* Menu */
+        setColor(11);
+        printf("=====================================\n");
 
-printf("=====================================\n");
-printf("1. Add Task\n");
-printf("2. View Tasks\n");
-printf("3. Mark Task as Complete\n");
-printf("4. Edit Task\n");
-printf("5. Delete Task\n");
-printf("6. Exit\n");
-printf("=====================================\n");
+        setColor(15);
+        printf("1. Add Task\n");
+        printf("2. View Tasks\n");
+        printf("3. Mark Task as Complete\n");
+        printf("4. Edit Task\n");
+        printf("5. Delete Task\n");
+        printf("6. Exit\n");
 
+        setColor(11);
+        printf("=====================================\n");
+
+        setColor(14);
         printf("Enter your choice: ");
+
         scanf("%d", &choice);
-        getchar(); // clear newline
+        getchar();
 
         switch (choice) {
+
             case 1:
                 addTask();
                 break;
@@ -109,11 +133,15 @@ printf("=====================================\n");
                 break;
 
             case 6:
+                setColor(10);
                 printf("\nThank you for using Simple To-Do List!\n");
+                setColor(15);
                 return 0;
 
             default:
+                setColor(12);
                 printf("\nInvalid choice!\n");
+                setColor(15);
                 pauseScreen();
         }
     }
@@ -121,34 +149,64 @@ printf("=====================================\n");
     return 0;
 }
 
+/* Add Task */
 void addTask() {
+
     if (taskCount >= MAX_TASKS) {
+
+        setColor(12);
         printf("\nTask list is full!\n");
+        setColor(15);
+
         pauseScreen();
         return;
     }
 
+    setColor(14);
     printf("\nEnter task: ");
-    fgets(tasks[taskCount].title, MAX_LENGTH, stdin);
 
-    // Remove newline
-    tasks[taskCount].title[strcspn(tasks[taskCount].title, "\n")] = '\0';
+    fgets(tasks[taskCount].title,
+          MAX_LENGTH,
+          stdin);
+
+    tasks[taskCount].title[
+        strcspn(tasks[taskCount].title, "\n")
+    ] = '\0';
 
     tasks[taskCount].completed = 0;
+
     taskCount++;
+
     saveTasks();
 
+    setColor(10);
     printf("\nTask added successfully!\n");
+    setColor(15);
+
     pauseScreen();
 }
 
+/* View Tasks */
 void viewTasks() {
+
+    setColor(11);
+
     printf("\n========== TASK LIST ==========\n");
 
     if (taskCount == 0) {
+
+        setColor(12);
         printf("No tasks available.\n");
+
     } else {
+
         for (int i = 0; i < taskCount; i++) {
+
+            if (tasks[i].completed)
+                setColor(10);
+            else
+                setColor(15);
+
             printf("%d. [%c] %s\n",
                    i + 1,
                    tasks[i].completed ? 'X' : ' ',
@@ -156,11 +214,17 @@ void viewTasks() {
         }
     }
 
+    setColor(11);
     printf("================================\n");
+
+    setColor(15);
+
     pauseScreen();
 }
 
+/* Mark Complete */
 void markComplete() {
+
     int num;
 
     viewTasks();
@@ -168,20 +232,33 @@ void markComplete() {
     if (taskCount == 0)
         return;
 
+    setColor(14);
     printf("\nEnter task number to mark complete: ");
+
     scanf("%d", &num);
+    getchar();
 
     if (num < 1 || num > taskCount) {
+
+        setColor(12);
         printf("\nInvalid task number!\n");
+
     } else {
+
         tasks[num - 1].completed = 1;
+
         saveTasks();
+
+        setColor(10);
         printf("\nTask marked as complete!\n");
     }
+
+    setColor(15);
 
     pauseScreen();
 }
 
+/* Edit Task */
 void editTask() {
 
     int num;
@@ -191,12 +268,15 @@ void editTask() {
     if (taskCount == 0)
         return;
 
+    setColor(14);
     printf("\nEnter task number to edit: ");
+
     scanf("%d", &num);
     getchar();
 
     if (num < 1 || num > taskCount) {
 
+        setColor(12);
         printf("\nInvalid task number!\n");
 
     } else {
@@ -213,12 +293,18 @@ void editTask() {
 
         saveTasks();
 
+        setColor(10);
         printf("\nTask updated successfully!\n");
     }
 
+    setColor(15);
+
     pauseScreen();
 }
+
+/* Delete Task */
 void deleteTask() {
+
     int num;
 
     viewTasks();
@@ -226,41 +312,67 @@ void deleteTask() {
     if (taskCount == 0)
         return;
 
+    setColor(14);
     printf("\nEnter task number to delete: ");
+
     scanf("%d", &num);
+    getchar();
 
     if (num < 1 || num > taskCount) {
+
+        setColor(12);
         printf("\nInvalid task number!\n");
+
     } else {
 
-        for (int i = num - 1; i < taskCount - 1; i++) {
+        for (int i = num - 1;
+             i < taskCount - 1;
+             i++) {
+
             tasks[i] = tasks[i + 1];
         }
 
         taskCount--;
+
         saveTasks();
 
+        setColor(10);
         printf("\nTask deleted successfully!\n");
     }
+
+    setColor(15);
 
     pauseScreen();
 }
 
+/* Clear Screen */
 void clearScreen() {
-    system("cls"); // Windows
+    system("cls");
 }
 
+/* Pause Screen */
 void pauseScreen() {
+
+    setColor(8);
+
     printf("\nPress Enter to continue...");
+
+    setColor(15);
+
     getchar();
 }
 
+/* Save Tasks */
 void saveTasks() {
 
     FILE *file = fopen("tasks.txt", "w");
 
     if (file == NULL) {
+
+        setColor(12);
         printf("Error saving tasks!\n");
+        setColor(15);
+
         return;
     }
 
@@ -275,6 +387,7 @@ void saveTasks() {
     fclose(file);
 }
 
+/* Load Tasks */
 void loadTasks() {
 
     FILE *file = fopen("tasks.txt", "r");

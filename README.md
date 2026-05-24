@@ -78,7 +78,7 @@ SimpleToDoList/
 **N Raja Ravi Varma**
 
 GitHub: [ItsRavi-AIML](https://github.com/ItsRavi-AIML)
-
+LinkedIn: [N Raja Ravi Varma](www.linkedin.com/in/raja-ravi-varma-n)
 ---
 
 <div align="center">
